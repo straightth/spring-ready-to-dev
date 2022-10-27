@@ -1,0 +1,140 @@
+openapi: 3.0.3
+info:
+  title: Flower orangery
+  description: Multi-file OpenAPI Flowers schema tend to be more concise than Petstore
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 0.0.1
+servers:
+  - url: https://localhost:8080/
+tags:
+  - name: flower
+    description: Flower-related stuff
+    externalDocs:
+      description: Reach flower pictures
+      url: https://www.pinterest.com/search/pins/?q=flowers&rs=typed
+paths:
+  /v1/flowers:
+    post:
+      tags:
+        - flower
+      summary: Add a new Flower to the shop
+      description: Creates a new flower
+      operationId: addFlower
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowerMutation'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowerDisplay'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '5XX':
+          $ref: '#/components/responses/UnexpectedError'
+
+  /v1/flowers/{flowerId}/:
+    get:
+      tags:
+        - flower
+      summary: Get an existing Flower
+      description: Get an existing Flower by id
+      operationId: getFlower
+      parameters:
+        - name: flowerId
+          in: path
+          required: true
+          description: Identity of the flower to return
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowerDisplay'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '5XX':
+          $ref: '#/components/responses/UnexpectedError'
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Explanation of cause of error
+
+    FlowerDisplay:
+      required:
+        - name
+        - color
+      description: Simple flower display, where Display postfix represents response DTO with all fields
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identity by which flower can be accessed unambiguously
+        name:
+          type: string
+          pattern: '[\w- ]+'
+          example: Chamomile
+        color:
+          type: string
+          enum:
+            - white
+            - yellow
+
+    FlowerMutation:
+      required:
+        - name
+        - color
+      description: Simple flower mutation, where Mutation postfix represents create/update DTO with only modifiable fields
+      type: object
+      properties:
+        name:
+          type: string
+          example: Chamomile
+        color:
+          type: string
+          enum:
+            - white
+            - yellow
+          description: Flower color
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    UnexpectedError:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

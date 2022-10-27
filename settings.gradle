@@ -1,0 +1,3 @@
+rootProject.name = 'spring-ready-to-dev'
+
+include 'flower-orangery-backend'
